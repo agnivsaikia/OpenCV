@@ -7,6 +7,8 @@
 using namespace cv;
 using namespace std;
 
+RNG rng(1);
+
 int main(int argc, char const *argv[])
 {
 	VideoCapture cap(0);//Open dfault camera
@@ -21,6 +23,7 @@ int main(int argc, char const *argv[])
 	Mat OrgVid;  
  	Mat hsvVid;  
  	Mat tVid;   
+ 	Mat org;
 
  	vector<Vec3f>v3fCircles;
 
@@ -49,21 +52,33 @@ int main(int argc, char const *argv[])
 
 		GaussianBlur(tVid, tVid, Size(5, 5), 0);   
   		dilate(tVid, tVid, 0);      
-  		erode(tVid, tVid, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)));       
+  		erode(tVid, tVid, getStructuringElement(MORPH_ELLIPSE, Size(3, 3))); 
 
-   		HoughCircles(tVid,v3fCircles,CV_HOUGH_GRADIENT,2,tVid.rows / 4,100,50,10,800);    
+  		 vector<vector<Point> > contours;
+  		 vector<Vec4i> hierarchy;
 
-     	 for (int i = 0; i < v3fCircles.size(); i++) 
-     	 {  if((v3fCircles[i][2]>=15)&&(v3fCircles[i][2]<=30))
-     	 	{               
-   				cout << "Ball position X = "<< v3fCircles[i][0]<<",\tY = "<< v3fCircles[i][1]<<",\tRadius = "<< v3fCircles[i][2]<< "\n";     // radius of circle
-		  		circle(OrgVid,Point((int)v3fCircles[i][0], (int)v3fCircles[i][1]),3,Scalar(0, 255, 0),CV_FILLED);
-				//circle(OrgVid,Point((int)v3fCircles[i][0], (int)v3fCircles[i][1]),(int)v3fCircles[i][2],Scalar(0, 0, 255),3); 
-			}
-		 } 
+  		findContours( tVid, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
 
-		imshow("Original", OrgVid);
+		/// Approximate contours to polygons + get bounding rects and circles
+		vector<vector<Point> > contours_poly( contours.size() );
+  		vector<Point2f>center( contours.size() );
+  		vector<float>radius( contours.size() );
+
+  		for( int i = 0; i < contours.size(); i++ )
+    	 { 
+    	   approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+    	   minEnclosingCircle( (Mat)contours_poly[i], center[i], radius[i] );
+    	 }
+    	 Mat drawing = Mat::zeros( tVid.size(), CV_8UC3 );
+  		for( int i = 0; i< contours.size(); i++ )
+    	 {
+      		drawContours( drawing, contours_poly, i, (0,0,255), 1, 8, vector<Vec4i>(), 0, Point() );
+      		circle( drawing, center[i], (int)radius[i], (0,0,255), 2, 8, 0 );
+     	 }
+
+        imshow("Original", OrgVid);
 		imshow("Thresh",tVid);
+		imshow("D",drawing);
 
 		if(waitKey(10)==27)
 		{

@@ -56,15 +56,9 @@ using namespace std;
 
     inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
       
-    GaussianBlur(imgThresholded, imgThresholded, Size(7,7), 0);
-  //morphological opening (remove small objects from the foreground)
-   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-   dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
-
-   //morphological closing (fill small holes in the foreground)
-   dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) ); 
-   erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)) );
-
+    GaussianBlur(imgThresholded, imgThresholded, Size(3, 3), 0);   
+    dilate(imgThresholded, imgThresholded, 0);      
+    erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)));    
    imshow("Thresholded Image", imgThresholded); //show the thresholded image
    imshow("Original", imgOriginal); //show the original image
 
