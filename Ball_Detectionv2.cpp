@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	VideoCapture cap(0);//Open dfault camera
+	VideoCapture cap(1);//Open dfault camera
 
 	if(cap.isOpened()==false)
 	{
@@ -23,15 +23,13 @@ int main(int argc, char const *argv[])
  	Mat tVid;   
  	Mat contours;
 
- 	vector<Vec3f>v3fCircles;
+ 	int lowH = 22;//28;       
+ 	int highH = 36;//42;
 
- 	int lowH = 28;       
- 	int highH = 42;
+ 	int lowS = 68;//23;       
+ 	int highS = 235;//130;
 
- 	int lowS = 23;       
- 	int highS = 130;
-
- 	int lowV = 145;      
+ 	int lowV = 77;//145;      
  	int highV = 255;
 
 	while(true)
@@ -48,16 +46,14 @@ int main(int argc, char const *argv[])
 
   		inRange(hsvVid, Scalar(lowH, lowS, lowV), Scalar(highH, highS, highV), tVid);
 
-		GaussianBlur(tVid, tVid, Size(7,7), 0);   
-  		//dilate(tVid, tVid, 0);      
-  		erode(tVid, tVid, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)));      
+		GaussianBlur(tVid, tVid, Size(7,7), 0);     
+  		erode(tVid, tVid, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));      
   		dilate( tVid, tVid, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) ); 
 
   		vector<vector<Point> > contours;
 		vector<Point> approx;
 		vector<Vec4i> hierarchy;
 		findContours(tVid, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE, Point(0,0));
-		vector<Rect> boundRect(contours.size());
 		vector<Moments> mu(contours.size() );
 		vector<Point2f>center( contours.size() );
   		vector<float>radius( contours.size() );

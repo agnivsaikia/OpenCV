@@ -7,7 +7,7 @@ using namespace std;
 
  int main( int argc, char** argv )
  {
-    VideoCapture cap(0); //capture the video from web cam
+    VideoCapture cap(1); //capture the video from web cam
 
     if ( !cap.isOpened() )  // if not success, exit program
     {
@@ -18,7 +18,7 @@ using namespace std;
     namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
 
   int iLowH = 0;
- int iHighH = 179;
+ int iHighH = 255;
 
   int iLowS = 0; 
  int iHighS = 255;
@@ -56,9 +56,9 @@ using namespace std;
 
     inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
       
-    GaussianBlur(imgThresholded, imgThresholded, Size(3, 3), 0);   
-    dilate(imgThresholded, imgThresholded, 0);      
-    erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3)));    
+    GaussianBlur(imgThresholded, imgThresholded, Size(7, 7), 0);   
+    erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(3, 3))); 
+    dilate(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)));         
    imshow("Thresholded Image", imgThresholded); //show the thresholded image
    imshow("Original", imgOriginal); //show the original image
 
